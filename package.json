@@ -1,0 +1,19 @@
+{
+  "name": "puppeteer-bot",
+  "version": "0.1.0",
+  "description": "PuppeterBot",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "puppeteer": "^17.1.3",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.1"
+  },
+  "engines": {
+    "node": "16.x"
+  }
+}
