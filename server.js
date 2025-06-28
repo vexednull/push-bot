@@ -119,6 +119,7 @@ const delay = ms => new Promise(r => setTimeout(r,ms*1000));
 
 
 async function start(){
+  console.log('STARTED BOT');
   const myDevice = gadgets[Math.floor(Math.random()*gadgets.length)];
   const browser = await puppeteer.launch({ headless: true,  args: [
     '--enable-notifications',
@@ -134,7 +135,7 @@ async function start(){
   const page = await browser.newPage();
 
   await page.setUserAgent(myDevice.agent);
-  await page.setViewport({ width: myDevice.width, height: myDevice.height});
+  //await page.setViewport({ width: myDevice.width, height: myDevice.height});
   await page.setViewport({ width: 392, height: 735});
   
   await page.evaluateOnNewDocument(() => {
@@ -148,19 +149,14 @@ async function start(){
   await page.goto('https://best-earn.vercel.app/');
   delay(6);
   setInterval(async () => {
-     const wclick = myDevice.width-(326+Math.ceil(Math.random()*125))
-     const hclick = myDevice.height-(445+Math.ceil(Math.random()*33));
-     console.log(hclick, wclick)
+     //const wclick = myDevice.width-(326+Math.ceil(Math.random()*125))
+     //const hclick = myDevice.height-(445+Math.ceil(Math.random()*33));
+     //console.log(hclick, wclick)
      await page.mouse.click(236, 589);
-  }, 100)
-  setInterval(async () => {
-     await page.screenshot({
-    path: 'public/img.png'
-  });
-  }, 1000)
- 
+  }, 500)
+  
   console.log(myDevice);
-  console.log('SCREENSHOT')
+  console.log('FINISH')
 }
 
 
