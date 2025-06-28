@@ -161,9 +161,6 @@ async function start(){
  
   console.log(myDevice);
   console.log('SCREENSHOT')
-
-  await delay(350);
-  await browser.close();
 }
 
 
