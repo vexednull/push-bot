@@ -153,7 +153,7 @@ async function start(){
      //const hclick = myDevice.height-(445+Math.ceil(Math.random()*33));
      //console.log(hclick, wclick)
      await page.mouse.click(236, 589);
-  }, 500)
+  }, 100)
   
   console.log(myDevice);
   console.log('FINISH')
