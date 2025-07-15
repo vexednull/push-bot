@@ -218,7 +218,6 @@ const delay = ms => new Promise(r => setTimeout(r,ms*1000));
 
 async function start(){
   console.log('STARTED BOT');
-  const myDevice = gadgets[Math.floor(Math.random()*gadgets.length)];
   const browser = await puppeteer.launch({ headless: true,  args: [
     '--enable-notifications',
     '--no-sandbox',
@@ -234,7 +233,7 @@ async function start(){
 
   await page.setUserAgent(laptops.userAgent);
   await page.setViewport(laptops.viewport);
-  await page.setViewport({ width: 392, height: 735});
+  await page.setViewport({ width: 800, height: 600});
   
   const device = laptops[Math.floor(Math.random() * laptops.length)];
 
@@ -308,22 +307,7 @@ async function start(){
       get: () => false,
     });
     
-    if ('getBattery' in navigator) {
-      navigator.getBattery = () => {
-      const onBattery = Math.random() < 0.3;
     
-      return Promise.resolve({
-        level: onBattery ? (Math.random() * 0.5 + 0.3).toFixed(2) : 1, // 30-80% если на батарее, 100% если от сети
-        charging: !onBattery,
-        chargingTime: onBattery ? 0 : (Math.floor(Math.random() * 180) + 60) * 60, // 1-4 часа до полной зарядки
-        dischargingTime: onBattery ? Math.floor(Math.random() * 5 + 1) * 3600 : Infinity, // 1-6 часов работы
-        onchargingchange: null,
-        onchargingtimechange: null,
-        ondischargingtimechange: null,
-        onlevelchange: null
-      });
-    }
-    }
   });
   
   await page.evaluateOnNewDocument(() => {
@@ -340,8 +324,11 @@ async function start(){
      //const wclick = myDevice.width-(326+Math.ceil(Math.random()*125))
      //const hclick = myDevice.height-(445+Math.ceil(Math.random()*33));
      //console.log(hclick, wclick)
-     await page.mouse.click(236, 589);
+     
+     //await page.mouse.click(236, 589);
   }, 100)
+  await delay(15000);
+  await page.screenshot({ path: 'public/img.png' })
   
   console.log(myDevice);
   console.log('FINISH')
