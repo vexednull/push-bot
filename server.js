@@ -220,7 +220,7 @@ async function start(){
   console.log('STARTED BOT');
   const device = laptops[Math.floor(Math.random() * laptops.length)];
 
-  const browser = await puppeteer.launch({ headless: false,  args: [
+  const browser = await puppeteer.launch({ headless: true,  args: [
     '--enable-notifications',
     '--no-sandbox',
     '--disable-setuid-sandbox',
