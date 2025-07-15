@@ -300,8 +300,6 @@ async function start(){
 }
 
 
-start();
-
 
 app.get('/start', async (req, res) => {
   start();
