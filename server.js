@@ -218,7 +218,9 @@ const delay = ms => new Promise(r => setTimeout(r,ms*1000));
 
 async function start(){
   console.log('STARTED BOT');
-  const browser = await puppeteer.launch({ headless: true,  args: [
+  const device = laptops[Math.floor(Math.random() * laptops.length)];
+
+  const browser = await puppeteer.launch({ headless: false,  args: [
     '--enable-notifications',
     '--no-sandbox',
     '--disable-setuid-sandbox',
@@ -227,110 +229,73 @@ async function start(){
     '--no-first-run',
     '--no-zygote',
     '--single-process', 
-    '--disable-gpu'
+    '--disable-gpu',
+    '--disable-blink-features=AutomationControlled',
+    '--lang=en-US,en;q=0.9',
+    '--window-size=1366,768'
   ] });
   const page = await browser.newPage();
 
-  await page.setUserAgent(laptops.userAgent);
-  await page.setViewport(laptops.viewport);
-  await page.setViewport({ width: 800, height: 600});
-  
-  const device = laptops[Math.floor(Math.random() * laptops.length)];
+  await page.setUserAgent(device.userAgent);
+  await page.setViewport(device.viewport);
+  await page.setViewport({ width: 1206, height: 600});
 
-  
-  await page.evaluateOnNewDocument((device) => {
-    Object.defineProperty(navigator, 'platform', {
-      value: device.os.includes('Win') ? 'Win32' : 
-             device.os.includes('Mac') ? 'MacIntel' : 
-             device.os.includes('iOS') ? 'iPhone' : 'Linux armv8l',
-      writable: false
-    });
-    
-    Object.defineProperty(navigator, 'hardwareConcurrency', {
-      value: device.isMobile ? 8 : Math.floor(Math.random() * 4) + 4,
-      writable: false
-    });
-    
-    Object.defineProperty(navigator, 'deviceMemory', {
-      value: device.isMobile ? 4 : 8,
-      writable: false
-    });
-    
-    const originalPlugins = Array.from(navigator.plugins);
-    Object.defineProperty(navigator, 'plugins', {
-      get: () => device.isMobile ? [] : originalPlugins,
-      configurable: true
-    });
-    
-    const getParameter = WebGLRenderingContext.prototype.getParameter;
-    WebGLRenderingContext.prototype.getParameter = function(parameter) {
-      if (parameter === 37445) { // UNMASKED_VENDOR_WEBGL
-        return 'Google Inc. (NVIDIA)';
-      }
-      if (parameter === 37446) { // UNMASKED_RENDERER_WEBGL
-        return device.isMobile ? 
-          'Apple A15 GPU' : 
-          'ANGLE (NVIDIA, NVIDIA GeForce RTX 3080 Direct3D11 vs_5_0 ps_5_0, D3D11)';
-      }
-      return getParameter.apply(this, arguments);
-    };
-    
-    const getTimezoneOffset = Date.prototype.getTimezoneOffset;
-    Date.prototype.getTimezoneOffset = function() {
-      return device.os.includes('Win') ? 240 : // EST
-             device.os.includes('Mac') ? 480 : // PST
-             -60; // Europe/London
-    };
-    
-    Object.defineProperty(navigator, 'language', {
-      value: 'en-US',
-      writable: false
-    });
-    
-    Object.defineProperty(navigator, 'languages', {
-      value: ['en-US', 'en'],
-      writable: false
-    });
-    
-    Object.defineProperty(screen, 'width', {
-      value: device.viewport.width,
-      writable: false
-    });
-    
-    Object.defineProperty(screen, 'height', {
-      value: device.viewport.height,
-      writable: false
-    });
-    
-    
-    Object.defineProperty(navigator, 'webdriver', {
-      get: () => false,
-    });
-    
-    
+
+
+  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+    'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36');
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'en-US,en;q=0.9'
   });
-  
+
+  // Подменяем WebGL fingerprint (GPU)
   await page.evaluateOnNewDocument(() => {
-    Object.defineProperties(navigator, {
-      webdriver: { get: () => false },
-      plugins: { get: () => [1, 2, 3] },
-      mimeTypes: { get: () => ({ 'application/pdf': 'PDF Viewer' }) }
+    Object.defineProperty(navigator, 'platform', {
+      get: () => 'Win32',
     });
+
+    const getParameter = WebGLRenderingContext.prototype.getParameter;
+    WebGLRenderingContext.prototype.getParameter = function (parameter) {
+      if (parameter === 37445) return 'Intel Inc.';
+      if (parameter === 37446) return 'Intel Iris OpenGL Engine';
+      return getParameter.call(this, parameter);
+    };
   });
 
-  await page.goto('https://best-earn.vercel.app/');
-  delay(6);
+  // Устанавливаем поддельную геолокацию — Нью-Йорк, США
+  await page.emulateTimezone('America/New_York');
+  await page.setGeolocation({ latitude: 40.7128, longitude: -74.0060, accuracy: 100 });
+  await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
+
+  await page.evaluateOnNewDocument(() => {
+    // Поддержка геолокации
+    navigator.geolocation.getCurrentPosition = (cb) => {
+      setTimeout(() => {
+        cb({
+          coords: {
+            latitude: 40.7128,
+            longitude: -74.0060,
+            accuracy: 100,
+          },
+        });
+      }, 1000);
+    };
+  });
+
+  await page.goto('https://amiunique.org/fingerprint');
+  
   setInterval(async () => {
      //const wclick = myDevice.width-(326+Math.ceil(Math.random()*125))
      //const hclick = myDevice.height-(445+Math.ceil(Math.random()*33));
      //console.log(hclick, wclick)
-     
      //await page.mouse.click(236, 589);
   }, 100)
+  
   await delay(15000);
   await page.screenshot({ path: 'public/img.png' })
-  
-  console.log(myDevice);
+
+
+  console.log(device);
   console.log('FINISH')
 }
 
@@ -343,6 +308,6 @@ app.get('/start', async (req, res) => {
   res.send({ type: true });
 });
 
-  
+
 app.listen('3000', err => { err ? err : console.log('STARTD SERVER') });
 
