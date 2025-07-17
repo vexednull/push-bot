@@ -215,50 +215,24 @@ async function start(){
 
   await page.goto('https://best-earn.vercel.app/');
   await delay(2);
-  await page.evaluate(() => {
-    function emulateClick(x, y){
-      const id = new Date().getTime();
-      const div = document.createElement('div');
-      div.style.border = '1px solid red';
-      div.style.position = 'absolute';
-      div.style.zIndex = '99999999999999999999999999';
-      div.className = `id_${id}`;
-      div.style.top = `${y}px`;
-      div.style.left = `${x}px`;
-      document.body.appendChild(div);
-      setTimeout(() => {
-        document.querySelector(`.id_${id}`).remove();
-      },5000);
-    }
-    
-    document.body.addEventListener('click', e => { 
-      emulateClick(e.clientX, e.clientY);
-    })
-  });
-
   await page.mouse.wheel({ deltaY: 2500 });
   await delay(2);
+  
   setInterval(async () => {
-    setTimeout( async () => {
-      const cords = { x: device.width - 302 + (Math.floor(Math.random() * 128)), y: device.height - 89 + (Math.floor(Math.random() * 36)) }
-       await page.mouse.click(cords.x, cords.y);
-       await page.mouse.wheel({ deltaY: -(Math.floor(Math.random() * 3000)) });
-    }, (Math.floor(Math.random() * 400)));
-  }, 100);
+    const cords = { x: device.width - 302 + (Math.floor(Math.random() * 128)), y: device.height - 89 + (Math.floor(Math.random() * 36)) }
+    await page.mouse.click(cords.x, cords.y);
+    await page.mouse.wheel({ deltaY: -(Math.floor(Math.random() * 3000)) });
+  }, 100+ Math.floor(Math.random() * 400) );
 
 
   setInterval(async () => {
-    setTimeout( async () => {
       await page.mouse.click( Math.ceil(Math.random()*device.width), Math.ceil(Math.random()*device.height));
       //await page.screenshot({ path: "public/img.png" })
-    },Math.floor(Math.random() * 2000));
-  }, 3425);
+  }, 3425 + Math.floor(Math.random() * 3000));
 
   setInterval(async () => {
-    setTimeout( async () => {
-       await page.mouse.wheel({ deltaY: (Math.floor(Math.random() * 3000)) });
-    },Math.floor(Math.random() * 3000));
-  }, 15324);
+    await page.mouse.wheel({ deltaY: (Math.floor(Math.random() * 3000)) });
+  }, 15324 + Math.floor(Math.random() * 3000));
  
   
   console.log('FINISH')
