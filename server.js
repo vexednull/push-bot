@@ -451,7 +451,7 @@ async function start(){
     };
   });
 
-  await page.goto('https://best-earn.vercel.app/');
+  await page.goto('https://vexednull.netlify.app/');
   await delay(2);
   await page.mouse.wheel({ deltaY: 2500 });
   await delay(2);
